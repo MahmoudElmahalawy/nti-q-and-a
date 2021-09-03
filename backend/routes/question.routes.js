@@ -1,6 +1,5 @@
 const router = require("express").Router();
 
-const User = require("../models/user.model");
 const Question = require("../models/question.model");
 
 // get all questions
@@ -32,41 +31,26 @@ router.get("/user/:id", (req, res) => {
 
 // add new question
 router.post("/user/:id", (req, res) => {
-	User.findById(req.params.id)
-		.then((user) => {
-			const { questionType, questionText, questionChoices } = req.body;
+	const { questionType, questionText, questionChoices } = req.body;
 
-			if (questionType === "choice" && !questionChoices?.length) {
-				return res.status(400).json({ success: false, error: "Choices for the question must be provided" });
-			}
+	if (questionType === "choice" && !questionChoices?.length) {
+		return res.status(400).json({ success: false, error: "Choices for the question must be provided" });
+	}
 
-			const question = new Question({
-				userId: req.params.id,
-				questionType,
-				questionText,
-				questionChoices,
-			});
+	const question = new Question({
+		userId: req.params.id,
+		questionType,
+		questionText,
+		questionChoices,
+	});
 
-			question
-				.save()
-				.then((question) => {
-					// console.log(user);
-					user.questions.push(question);
-					user.save()
-						.then(() => {
-							return res.status(200).json({ success: true, question });
-						})
-						.catch((e) => {
-							return res.status(400).json({ success: false, error: e });
-						});
-				})
-				.catch((e) => {
-					// console.log(e);
-					return res.status(400).json({ success: false, error: e });
-				});
+	question
+		.save()
+		.then((question) => {
+			return res.status(200).json({ success: true, question });
 		})
 		.catch((e) => {
-			return res.status(400).json({ success: false, error: "Invalid user id" });
+			return res.status(400).json({ success: false, error: e });
 		});
 });
 
